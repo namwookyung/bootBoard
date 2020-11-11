@@ -27,6 +27,7 @@
 		out.println("history.back()");
 		out.println("</script>");
 	} else {
+		session.setAttribute("userID", user.getUserID());
 		out.println("<script>");
 		out.println("location.href='main.jsp'");
 		out.println("</script>");
