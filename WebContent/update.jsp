@@ -46,7 +46,7 @@
 					aria-expanded="false">접속하기</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<%
-							if (id == null) {
+							if (userID == null) {
 						%>
 						<a class="dropdown-item" href="login.jsp"> 로그인</a>
 						<div class="dropdown-divider"></div>
@@ -63,25 +63,53 @@
 			</ul>
 		</div>
 	</nav>
+	
+	<%
+		if (session.getAttribute("userID") != null)
+			userID = (String) session.getAttribute("userID");
+		if (userID == null) {
+			out.println("<script>");
+			out.println("alert('로그인을 하세요.')");
+			out.println("location.href='login.jsp'");
+			out.println("</script>");
+		}
+		int bbsID = 0;
+		if (request.getParameter("bbsID") != null)
+			bbsID = Integer.parseInt(request.getParameter("bbsID"));
+		if (bbsID == 0) {
+			out.println("<script>");
+			out.println("alert<'유효하지 않은 글입니다.')");
+			out.println("location.href='bbs.jsp'");
+			out.println("</script>");
+		}
+		BbsDAO bbsDAO = new BbsDAO();
+		Bbs bbs = bbsDAO.getBbs(bbsID);
+		if (!userID.equals(bbs.getUserID())) {
+			out.println("<script>");
+			out.println("alert<'권한이 없습니다'>");
+			out.println("location.href='bbs.jsp'");
+			out.println("</script>");
+		}
+	%>
 
 	<!-- JUMBOTRON -->
 	<div class="container pt-3">
-		<form method="post" action="writeAction.jsp">
+		<form method="post" action="updateAction.jsp?bbsID=<%=bbsID%>">
 			<table class="table table-striped text-center">
 				<thead class="thead-light">
 					<tr>
-						<th>게시판 글쓰기</th>
+						<th>게시판 글 수정</th>
 					</tr>
 				</thead>
 				<tbody>
 					<tr>
 						<td><input type="text" class="form-control"
-							placeholder="글 제목" name='bbsTitle' maxlength="50" /></td>
+							placeholder="글 제목" name='bbsTitle' maxlength="50" /><%=bbs.getBbsTitle() %></td>
 					</tr>
 					<tr>
 						<td><textarea class="form-control" placeholder="글 내용"
 								name="bbsContent" maxlength="2048"
-								style="height: 350px; resize: none;"></textarea></td>
+								style="height: 350px; resize: none;"><%=bbs.getBbsContent() %></textarea></td>
 					</tr>
 				</tbody>
 			</table>

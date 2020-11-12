@@ -1,9 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ page import="bbs.BbsDAO" %>
+<%@ page import="bbs.Bbs" %>
 <%
-	String id = (String) session.getAttribute("userID");
-	if (id == null) {
-	response.sendRedirect("main.jsp");
+	String userID = null;
+	if (session.getAttribute("userID") != null) { userID = (String) session.getAttribute("userID");
+	int bbsID = 0;
+	if (request.getParameter("bbsID") != null) { bbsID = Integer.parseInt(request.getParameter("bbsID"));
 }
 %>
 <!DOCTYPE html>
@@ -46,7 +49,7 @@
 					aria-expanded="false">접속하기</a>
 					<div class="dropdown-menu" aria-labelledby="navbarDropdown">
 						<%
-							if (id == null) {
+							if (userID == null) {
 						%>
 						<a class="dropdown-item" href="login.jsp"> 로그인</a>
 						<div class="dropdown-divider"></div>
@@ -63,31 +66,60 @@
 			</ul>
 		</div>
 	</nav>
+	<%
+		if(bbsID == 0) {
+			out.println("<script>");
+			out.println("alert<'유효하지 않은 글입니다.')");
+			out.println("location.href = 'bbs.jsp'");
+			out.println("</script>");
+		}
+		BbsDAO bbsDAO = new BbsDAO();
+		Bbs bbs = new BbsDAO().getBbs(bbsID);
+		if(bbs == null) {
+			out.println("<script>");
+			out.println("alert<'작성되지 않은 글입니다.')");
+			out.println("location.href = 'bbs.jsp'");
+			out.println("</script>");
+		}
+	%>
 
 	<!-- JUMBOTRON -->
 	<div class="container pt-3">
-		<form method="post" action="writeAction.jsp">
-			<table class="table table-striped text-center">
-				<thead class="thead-light">
-					<tr>
-						<th>게시판 글쓰기</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr>
-						<td><input type="text" class="form-control"
-							placeholder="글 제목" name='bbsTitle' maxlength="50" /></td>
-					</tr>
-					<tr>
-						<td><textarea class="form-control" placeholder="글 내용"
-								name="bbsContent" maxlength="2048"
-								style="height: 350px; resize: none;"></textarea></td>
-					</tr>
-				</tbody>
-			</table>
-			<a href="bbs.jsp" class="btn btn-success float-left">목록</a>
-			<button type="submit" class="btn btn-primary float-right">글쓰기</button>
-		</form>
+		<table class="table table-striped table-bordered text-center">
+			<thead class="thead-light">
+				<tr>
+					<th colspan="3">게시판 글보기</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td style="width:20%;">글 제목</td>
+					<td colspan="2"><%=bbs.getBbsTitle()%></td>
+				</tr>
+				<tr>
+					<td>작성자</td>
+					<td colspan="2"><%=bbs.getUserID()%></td>
+				</tr>
+				<tr>
+					<td>작성일자</td>
+					<td colspan="2"><%=bbs.getBbsDate()%></td>
+				</tr>
+				<tr>
+					<td>내용</td>
+					<td colspan="2" style="min-height:200px; text-align:left;"><%=bbs.getBbsContent()%></td>
+				</tr>
+			</tbody>
+		</table>
+<%
+	String opt="";
+	if(userID == null || !userID.equals(bbs.getUserID())) {
+		opt = " disabled";
+	}
+	bbsDAO
+%>
+		<a href="bbs.jsp" class="btn btn-success float-left">목록</a>
+		<a href="" class="btn btn- float-"></a>
+		<a href="" class="btn btn- float-"></a>
 	</div>
 
 	<!-- Optional JavaScript-->
